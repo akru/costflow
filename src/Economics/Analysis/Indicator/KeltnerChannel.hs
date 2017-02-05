@@ -13,7 +13,7 @@
 module Economics.Analysis.Indicator.KeltnerChannel where
 
 import Economics.Analysis.Indicator.MA
-import Economics.Analysis.OHLC
+import Economics.Analysis.OHLC (OHLC(..))
 import Data.Vector.Unboxed as V
 
 -- | Original Keltner channel estimator

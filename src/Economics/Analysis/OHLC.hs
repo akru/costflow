@@ -23,3 +23,10 @@ data OHLC a = OHLC
   { period  :: !DiffTime
   , dataset :: !(Vector (a, a, a, a))
   } deriving (Eq, Show)
+
+-- | Tick accessors
+open, high, low, close :: (a, a, a, a) -> a
+open  (o, _, _, _) = o
+high  (_, h, _, _) = h
+low   (_, _, l, _) = l
+close (_, _, _, c) = c

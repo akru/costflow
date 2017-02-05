@@ -17,6 +17,8 @@ library
   hs-source-dirs:      src
   exposed-modules:     Economics.Analysis.OHLC
                      , Economics.Analysis.Indicator.MA
+                     , Economics.Analysis.Indicator.MACD
+                     , Economics.Analysis.Indicator.Stochastic
                      , Economics.Analysis.Indicator.KeltnerChannel
                      , Economics.Analysis.Indicator.BollingerBands
   build-depends:       base >= 4.7 && < 5, vector, time

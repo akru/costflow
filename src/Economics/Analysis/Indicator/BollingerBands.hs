@@ -26,7 +26,7 @@ bollinger ohlc = (upLine, downLine)
         downLine = V.zipWith (-) ma sigma
         ma       = sma 20 closed
         sigma    = V.map (* 2) $ stddev 20 closed
-        closed   = V.map (\(_, _, _, c) -> c) $ dataset ohlc
+        closed   = V.map close (dataset ohlc)
 
 stddev :: (Unbox a, Floating a) => Int -> Vector a -> Vector a
 stddev n v = V.map stddev' [0 .. V.length v - n]
