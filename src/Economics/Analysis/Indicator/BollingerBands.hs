@@ -30,6 +30,6 @@ bollinger ohlc = (upLine, downLine)
 
 stddev :: Floating a => Int -> Vector a -> Vector a
 stddev n v = stddev' <$> [0 .. V.length v - n]
-  where window t  = V.slice t (t + n) v
+  where window t  = V.slice t n v
         delta t   = (^ (2 :: Int)) . (sma n v ! t -) <$> window t
         stddev' t = sqrt (V.sum (delta t) / fromIntegral n)
