@@ -14,14 +14,14 @@ module Economics.Analysis.Indicator.KeltnerChannel where
 
 import Economics.Analysis.Indicator.MA
 import Economics.Analysis.OHLC
-import Data.Vector as V
+import Data.Vector.Unboxed as V
 
 -- | Original Keltner channel estimator
-keltner :: Floating a => OHLC a -> (Vector a, Vector a)
+keltner :: (Unbox a, Floating a) => OHLC a -> (Vector a, Vector a)
 keltner ohlc = (upLine, downLine)
   where upLine   = V.zipWith (+) smaTP smaTR
         downLine = V.zipWith (-) smaTP smaTR
-        smaTP    = sma 10 (typicalPrice <$> dataset ohlc)
-        smaTR    = sma 10 (tradingRange <$> dataset ohlc)
-        typicalPrice t = (high t + low t + close t) / 3
-        tradingRange t = high t - low t
+        smaTP    = sma 10 (V.map typicalPrice $ dataset ohlc)
+        smaTR    = sma 10 (V.map tradingRange $ dataset ohlc)
+        typicalPrice (_, high, low, close) = (high + low + close) / 3
+        tradingRange (_, high, low, _)     = high - low

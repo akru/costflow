@@ -15,19 +15,11 @@
 --
 module Economics.Analysis.OHLC where
 
-import Data.Vector (Vector)
+import Data.Vector.Unboxed (Vector)
 import Data.Time (DiffTime)
-
--- | Price tick
-data Tick a = Tick
-  { open  :: !a
-  , high  :: !a
-  , low   :: !a
-  , close :: !a
-  } deriving (Eq, Show)
 
 -- | OHLC dataset with period
 data OHLC a = OHLC
   { period  :: !DiffTime
-  , dataset :: !(Vector (Tick a))
+  , dataset :: !(Vector (a, a, a, a))
   } deriving (Eq, Show)

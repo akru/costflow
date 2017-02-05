@@ -12,14 +12,14 @@
 --
 module Economics.Analysis.Indicator.MA where
 
-import Data.Vector as V
+import Data.Vector.Unboxed as V
 
 -- | A simple moving average (SMA) is an arithmetic moving average
 -- calculated by adding the closing price of the security for
 -- a number of time periods and then dividing this total by the
 -- number of time periods.
-sma :: Floating a => Int -> Vector a -> Vector a
-sma n dataset = average . window <$> [0 .. V.length dataset - n]
+sma :: (Unbox a, Floating a) => Int -> Vector a -> Vector a
+sma n dataset = V.map (average . window) [0 .. V.length dataset - n]
   where average  = (/ fromIntegral n) . V.sum
         window t = V.slice t n dataset
 
@@ -28,7 +28,7 @@ sma n dataset = average . window <$> [0 .. V.length dataset - n]
 -- more weight is given to the latest data. It's also known as the
 -- exponentially weighted moving average. This type of moving average
 -- reacts faster to recent price changes than a simple moving average.
-ema :: Floating a => Int -> Vector a -> Vector a
+ema :: (Unbox a, Floating a) => Int -> Vector a -> Vector a
 ema n dataset = V.scanl ema' (V.head dataset) (V.tail dataset)
   where ema' e p = alpha * p + (1 - alpha) * e
         alpha    = 2 / (fromIntegral n + 1)
@@ -40,11 +40,11 @@ ema n dataset = V.scanl ema' (V.head dataset) (V.tail dataset)
 -- and follow prices from a greater distance. This trend-following
 -- indicator can be used to identify the overall trend, time turning
 -- points and filter price movements.
-ama :: Floating a => Vector a -> Vector a
-ama dataset = ama' <$> [n + 1 .. V.length dataset - 1]
+ama :: (Unbox a, Floating a) => Vector a -> Vector a
+ama dataset = V.map ama' [n + 1 .. V.length dataset - 1]
   where signal t  = abs (dataset ! t - dataset ! (t - n - 1))
         delta t i = abs (dataset ! (t - i) - dataset ! (t - i - 1))
-        noise t   = V.sum (delta t <$> [0 .. n - 1])
+        noise t   = V.sum (V.map (delta t) [0 .. n - 1])
         er t      = signal t / noise t
         sc t      = (er t * (fastest - slowest) + slowest) ^ (2 :: Int)
         n         = 10

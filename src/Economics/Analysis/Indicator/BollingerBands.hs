@@ -18,18 +18,18 @@ module Economics.Analysis.Indicator.BollingerBands (bollinger) where
 
 import Economics.Analysis.Indicator.MA
 import Economics.Analysis.OHLC
-import Data.Vector as V
+import Data.Vector.Unboxed as V
 
-bollinger :: Floating a => OHLC a -> (Vector a, Vector a)
+bollinger :: (Unbox a, Floating a) => OHLC a -> (Vector a, Vector a)
 bollinger ohlc = (upLine, downLine)
   where upLine   = V.zipWith (+) ma sigma
         downLine = V.zipWith (-) ma sigma
         ma       = sma 20 closed
-        sigma    = (* 2) <$> stddev 20 closed
-        closed   = close <$> dataset ohlc
+        sigma    = V.map (* 2) $ stddev 20 closed
+        closed   = V.map (\(_, _, _, c) -> c) $ dataset ohlc
 
-stddev :: Floating a => Int -> Vector a -> Vector a
-stddev n v = stddev' <$> [0 .. V.length v - n]
+stddev :: (Unbox a, Floating a) => Int -> Vector a -> Vector a
+stddev n v = V.map stddev' [0 .. V.length v - n]
   where window t  = V.slice t n v
-        delta t   = (^ (2 :: Int)) . (sma n v ! t -) <$> window t
+        delta t   = V.map ((^ (2 :: Int)) . (sma n v ! t -)) $ window t
         stddev' t = sqrt (V.sum (delta t) / fromIntegral n)
