@@ -41,7 +41,7 @@ ema n dataset = V.scanl ema' (V.head dataset) (V.tail dataset)
 -- indicator can be used to identify the overall trend, time turning
 -- points and filter price movements.
 ama :: (Unbox a, Floating a) => Vector a -> Vector a
-ama dataset = V.map ama' [n + 1 .. V.length dataset - 1]
+ama dataset = V.scanl ama' (dataset ! n) [n + 1 .. V.length dataset - 1]
   where signal t  = abs (dataset ! t - dataset ! (t - n - 1))
         delta t i = abs (dataset ! (t - i) - dataset ! (t - i - 1))
         noise t   = V.sum (V.map (delta t) [0 .. n - 1])
@@ -50,5 +50,4 @@ ama dataset = V.map ama' [n + 1 .. V.length dataset - 1]
         n         = 10
         fastest   = 2 / (2 + 1)
         slowest   = 2 / (30 + 1)
-        ama' t | t <= n    = dataset ! n
-               | otherwise = sc t * (dataset ! t) + (1 - sc t) * ama' (t - 1)
+        ama' a t  = sc t * (dataset ! t) + (1 - sc t) * a
